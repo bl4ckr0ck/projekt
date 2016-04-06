@@ -1,0 +1,40 @@
+phi = 1.618033988749895; %(sqrt(5) + 1)/2  - współczynnik złotego podziału
+ 
+ %metoda zlotego podzialu
+ a = -33;
+ b = 33;
+  eps_step = 0.00000001;
+  c1 = (phi - 1)*a + (2 - phi)*b;
+  c2 = (2 - phi)*a + (phi - 1)*b;
+ for i=1:100
+    if ( f( c1 ) < f( c2 ) )
+        % wybierz przedział [b, c2]
+      b = c2;
+      c2 = c1;
+      c1 = (phi - 1)*a + (2 - phi)*b;
+    else
+        %wybierz przedzial[a,c1]
+      a = c1;
+      c1 = c2;
+      c2 = (2 - phi)*a + (phi - 1)*b;
+    end
+
+    if ( (b - a) < eps_step )
+        break;
+    elseif i == 100 
+        error( 'nie mozna znalezc minimum' );
+    end
+ end
+%wyliczenie minimum przedzialu
+ pts = [a c1 c2 b];
+ fpts = f( [a c1 c2 b] );
+format long
+[minimum, krok] = min( fpts )
+  
+  %funkcja 
+  
+  function y = f(x)
+   y = exp(x);
+end
+
+  
