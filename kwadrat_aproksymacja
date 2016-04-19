@@ -1,0 +1,174 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+
+vector<double> mnozenie(vector<double> granica_a, double liczba){
+    for(int i=0; i<granica_a.size(); i++)
+		granica_a[i] = granica_a[i]*liczba; 
+	return granica_a;
+}
+vector<double> odejmowanie(vector<double> granica_a, vector<double> granica_b){
+	for(int i=0; i<granica_a.size(); i++)
+		granica_a[i] = granica_a[i]-granica_b[i];
+	return granica_a; //granica_a - granica_b
+}
+
+int main()
+{
+	//Aproksymacja średniokwadratowa dyskretna przy pomocy wielomianu
+	int times;
+	cin >> times;
+	for(int tt=0; tt<times; tt++)
+	{
+		int m = 2;  //stopień wielomianu aproksymującego
+		int n =5;  //liczba węzłów aproksymacji, po ludzku znanych punktow 
+		//cin >> m >> n;
+		m++;
+		vector<double> x; //double *x = new double[n];
+		vector<double> y;//double *y = new double[n];
+		vector<double> s; //double *s = new double[2*m];
+		vector<double> x2 ;//double *x2 = new double[n];
+		vector<vector<double> > macierz;//double **macierz = new double *[m];
+		vector<double> a; //double *a = new double[m];
+		for(int i=0; i<n; i++)
+		{
+			int xx; int yy;
+			//cin >> x[i] >> y[i];
+			//x2[i]=1.0;
+			cin >> xx >> yy;
+			x.push_back(xx);
+			y.push_back(yy);
+			x2.push_back(1.0);
+		}
+
+		
+
+		//s to na poczatku 0, x2 to na poczatku 1
+		for(int i=0; i<2*m; i++)
+		{
+			//s[i]=0.0;
+			s.push_back(0.0);
+			if(i==m+1)
+			{
+				for(int j=0; j<m; j++)
+				{
+					macierz.push_back(s);
+					a.push_back(0.0);
+				}
+			}
+		}
+		//for(int i=0; i<m; i++)
+		//{
+		//	macierz[i]=new double[i+1];
+		//}
+
+		//tysiac forów później...
+		//supcio, mamy macierz n na n+1. osom.
+
+		//teraz sobie wyznaczymy s[i], jest ich 2*m
+		for(int i=0; i<2*m; i++)
+		{
+			//liczymy si. czyli
+			//si = sumie wszystkich probek do potegi i
+			//najpierw dodawaj potem przemnazaj
+			for(int j=0; j<n; j++)
+				s[i]+=x2[j];
+
+			int xx=0;
+			int yy=i;
+			for(int j=0; j<m; j++)
+			{
+				if(xx>=0 && xx<m && yy>=0 && yy<m)
+					macierz[xx][yy]=s[i];
+
+				xx++; yy--;
+			}
+			//zakladajac ze s sie dobrze liczy i przypisuje zrobie kolejne potegi
+		
+			if(i<m)
+			{
+				double t=0;
+				for(int j=0; j<n; j++)
+				{
+					t+=y[j]*x2[j];
+				}
+				macierz[i][m]=t;
+			}
+
+
+			for(int j=0; j<n; j++)
+				x2[j]=x2[j]*x[j]; //potegujemy
+			
+		}
+		//gauss down,
+
+		for(int i=0; i<m; i++)
+		{
+			for(int j=0; j<m+1; j++)
+				cout << macierz[i][j] << " ";
+			cout << "\n";
+		}
+
+		for(int i=0; i<m; i++)
+		{
+			int najnaj=i;
+			for(int j=i; j<m; j++)
+			{
+				if(macierz[j][i]>macierz[najnaj][i])
+					najnaj=j;
+			}
+			
+			macierz[i].swap(macierz[najnaj]);
+			//zamiana kolejnosci wierzy, to trzeba napisac
+			//double* pom = new double[m+1];
+			//for(int j=0; j<m+1; j++)
+			//{
+			//	pom[j]=macierz[i][j];
+			//	macierz[i][j]=macierz[najnaj][j];
+			//	macierz[najnaj][j]=pom[j];
+			//}	
+			//delete [] pom;
+
+			macierz[i] = mnozenie(macierz[i], 1/macierz[i][i]);
+			//mnozenie wiersza przez wyraz, to tez.
+
+			for(int j=i+1; j<m; j++)
+			{
+				macierz[j]=odejmowanie(macierz[j], mnozenie(macierz[i], macierz[j][i]));
+				//odejmowanie i mnozenie, jej.
+			}
+		}
+
+
+		a[m]=macierz[m-1][m];
+		for(int i=m-2; i>=0; i--)
+		{
+			a[i]=macierz[i][m];
+			for(int j=m-1; j>i; j--)
+			{
+				a[i]-=a[j]*macierz[i][j];
+			}
+		}
+
+		for(int i=0; i<m; i++)
+		{
+			cout << a[i] << "\n";
+		}
+		//int ile; // liczba zapytań o aproksymowane wartości 
+		//cin >> ile;
+		//for(int i=0; i<ile; i++)
+		//{}
+		
+		//delete [] a;
+		//delete [] x;
+		//delete [] y;
+		//delete [] macierz;
+		//delete [] s;
+		//delete [] x2;
+
+	}
+	
+	return 0;
+}
